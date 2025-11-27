@@ -1,17 +1,28 @@
+import os
+os.environ["HTTP_PROXY"] = ""
+os.environ["HTTPS_PROXY"] = ""
+os.environ["http_proxy"] = ""
+os.environ["https_proxy"] = ""
 from src.helper import load_pdf, text_split, download_hugging_face_embeddings
 from pinecone import Pinecone as PineconeClient
 from pinecone import ServerlessSpec
 from dotenv import load_dotenv
-import os
+
 from sentence_transformers import SentenceTransformer
 import time
 import torch
+
+import urllib.request
+opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+urllib.request.install_opener(opener)
+
+
 
 load_dotenv()
 
 PINECONE_API_KEY = os.environ.get('PINECONE_API_KEY')
 PINECONE_API_ENV = os.environ.get('PINECONE_API_ENV')
-PROXY_URL = os.environ.get('PROXY_URL')
+# PROXY_URL = os.environ.get('PROXY_URL')
 PINECONE_CLOUD = os.environ.get('PINECONE_CLOUD')
 PINECONE_REGION = os.environ.get('PINECONE_REGION')
 
@@ -21,9 +32,11 @@ text_chunks = text_split(extracted_data)
 embeddings = download_hugging_face_embeddings()
 
 
-#Initializing the Pinecone
-pc = PineconeClient(api_key=os.environ.get('PINECONE_API_KEY'),
-                    proxy_url=os.environ.get('PROXY_URL'))
+# #Initializing the Pinecone
+# pc = PineconeClient(api_key=os.environ.get('PINECONE_API_KEY'),
+#                     proxy_url=os.environ.get('PROXY_URL'))
+pc = PineconeClient(api_key=os.environ.get('PINECONE_API_KEY'))
+
 
 cloud = os.environ.get('PINECONE_CLOUD') or 'aws'
 region = os.environ.get('PINECONE_REGION') or 'us-east-1'
